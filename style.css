@@ -61,4 +61,19 @@ button {
   object-fit: contain;
   border: 2px solid #999;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  margin-bottom: 10px;
+  page-break-inside: avoid;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+ul li {
+  margin-bottom: 10px;
+  page-break-inside: avoid;
+}
+
+#hasilData {
+  page-break-inside: avoid;
 }
