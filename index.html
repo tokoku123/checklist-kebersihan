@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checklist Kebersihan + Foto</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Checklist Kebersihan Harian</h2>
+
+    <label for="tanggal">Tanggal:</label>
+    <input type="date" id="tanggal" />
+
+    <label for="petugas">Nama Petugas:</label>
+    <input type="text" id="petugas" placeholder="Masukkan nama petugas" />
+
+    <div class="task">
+      <label><input type="checkbox" id="sapu" /> Menyapu Lantai</label>
+      <label><input type="checkbox" id="pel" /> Mengepel Lantai</label>
+      <label><input type="checkbox" id="lap" /> Membersihkan Meja</label>
+      <label><input type="checkbox" id="sampah" /> Membuang Sampah</label>
+    </div>
+
+    <label for="catatan">Catatan Tambahan:</label>
+    <textarea id="catatan" rows="3" placeholder="Contoh: sabun pel habis..."></textarea>
+
+    <label for="foto">Upload Foto Hasil Kebersihan:</label>
+    <input type="file" id="foto" multiple accept="image/*" />
+
+    <div class="preview" id="previewFoto"></div>
+
+    <button onclick="simpanChecklist()">Simpan Checklist</button>
+  </div>
+
+  <script>
+    const fotoInput = document.getElementById("foto");
+    const previewFoto = document.getElementById("previewFoto");
+
+    fotoInput.addEventListener("change", function () {
+      previewFoto.innerHTML = "";
+      Array.from(fotoInput.files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.classList.add("foto-preview");
+          previewFoto.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    function simpanChecklist() {
+      const tanggal = document.getElementById("tanggal").value;
+      const petugas = document.getElementById("petugas").value;
+      const catatan = document.getElementById("catatan").value;
+
+      const tugas = [
+        { label: "Menyapu Lantai", done: document.getElementById("sapu").checked },
+        { label: "Mengepel Lantai", done: document.getElementById("pel").checked },
+        { label: "Membersihkan Meja", done: document.getElementById("lap").checked },
+        { label: "Membuang Sampah", done: document.getElementById("sampah").checked }
+      ];
+
+      const hasilChecklist = {
+        tanggal,
+        petugas,
+        catatan,
+        tugas,
+        fotoData: []
+      };
+
+      const files = document.getElementById("foto").files;
+      const promises = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+        const promise = new Promise(resolve => {
+          reader.onload = () => {
+            hasilChecklist.fotoData.push(reader.result);
+            resolve();
+          };
+          reader.readAsDataURL(files[i]);
+        });
+        promises.push(promise);
+      }
+
+      Promise.all(promises).then(() => {
+        localStorage.setItem("checklistTerakhir", JSON.stringify(hasilChecklist));
+        window.location.href = "hasil.html";
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hasil Checklist Kebersihan</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+  <div class="container" id="laporan">
+    <h2>Hasil Checklist Kebersihan</h2>
+    <div id="hasilData"></div>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px;">
+    <button id="btnPDF" style="display: none;" onclick="simpanPDF()">💾 Simpan ke PDF</button>
+  </div>
+
+  <script>
+    function tampilkanData() {
+      const data = JSON.parse(localStorage.getItem("checklistTerakhir"));
+      if (!data) {
+        document.getElementById("hasilData").innerHTML = "<p>Belum ada data checklist.</p>";
+        return;
+      }
+
+      let html = `
+        <p><strong>Tanggal:</strong> ${data.tanggal}</p>
+        <p><strong>Petugas:</strong> ${data.petugas}</p>
+        <ul>
+      `;
+      data.tugas.forEach(t => {
+        html += `<li>${t.done ? "✅" : "❌"} ${t.label}</li>`;
+      });
+      html += `</ul>`;
+      html += `<p><strong>Catatan:</strong> ${data.catatan || '-'}</p>`;
+
+      if (data.fotoData && data.fotoData.length > 0) {
+        html += `<p><strong>Foto:</strong></p><div class="foto-hasil">`;
+        data.fotoData.forEach(src => {
+          html += `<img src="${src}" class="foto-preview">`;
+        });
+        html += `</div>`;
+      }
+
+      document.getElementById("hasilData").innerHTML = html;
+      document.getElementById("btnPDF").style.display = "inline-block";
+    }
+
+    function simpanPDF() {
+      const laporan = document.getElementById("laporan");
+      setTimeout(() => {
+        html2pdf().set({
+          margin: 10,
+          filename: 'Checklist-Kebersihan.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).from(laporan).save();
+      }, 500);
+    }
+
+    window.onload = tampilkanData;
+  </script>
+</body>
+</html>
