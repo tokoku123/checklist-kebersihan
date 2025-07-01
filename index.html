@@ -38,6 +38,8 @@
     <textarea id="catatan" rows="3" placeholder="Contoh: sabun pel habis..."></textarea>
 
     <button onclick="simpanChecklist()">Simpan Checklist</button>
+    <br><br>
+    <a href="hasil.html" target="_blank">🔍 Lihat Hasil Terakhir</a>
   </div>
 
   <script>
@@ -96,7 +98,7 @@
 
       Promise.all(promises).then(() => {
         localStorage.setItem("checklistTerakhir", JSON.stringify(hasilChecklist));
-        window.location.href = "hasil.html";
+        alert("Checklist berhasil disimpan!");
       });
     }
   </script>
