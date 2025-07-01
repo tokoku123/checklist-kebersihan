@@ -37,30 +37,32 @@
       }
     }
 
-    function tampilkanData() {
-      const data = JSON.parse(localStorage.getItem("checklistTerakhir"));
-      if (!data) {
-        document.getElementById("hasilData").innerHTML = "<p>Belum ada data checklist.</p>";
-        return;
-      }
+function tampilkanData() {
+  const data = JSON.parse(localStorage.getItem("checklistTerakhir"));
+  if (!data) {
+    document.getElementById("hasilData").innerHTML = "<p>Belum ada data checklist.</p>";
+    return;
+  }
 
-      let html = `
-        <p><strong>Tanggal:</strong> ${data.tanggal}</p>
-        <p><strong>Petugas:</strong> ${data.petugas}</p>
-        <ul>
-      `;
-      data.tugas.forEach((t) => {
-        html += `<li>${t.done ? "✅" : "❌"} ${t.label}</li>`;
-        if (data.fotoTugas && data.fotoTugas[t.id]) {
-          html += `<br><img src="${data.fotoTugas[t.id]}" class="foto-preview">`;
-        }
-      });
-      html += `</ul>`;
-      html += `<p><strong>Catatan:</strong> ${data.catatan?.trim() || '-'}</p>`;
+  const hasil = document.createElement("div");
+  hasil.innerHTML = `
+    <p><strong>Tanggal:</strong> ${data.tanggal}</p>
+    <p><strong>Petugas:</strong> ${data.petugas}</p>
+    <ul>
+      ${data.tugas.map(t => `
+        <li style="page-break-inside: avoid;">
+          ${t.done ? "✅" : "❌"} ${t.label}
+          ${data.fotoTugas[t.id] ? `<br><img src="${data.fotoTugas[t.id]}" class="foto-preview">` : ""}
+        </li>
+      `).join("")}
+    </ul>
+    <p><strong>Catatan:</strong> ${data.catatan?.trim() || '-'}</p>
+  `;
 
-      document.getElementById("hasilData").innerHTML = html;
-      document.getElementById("btnPDF").style.display = "inline-block";
-    }
+  document.getElementById("hasilData").innerHTML = "";
+  document.getElementById("hasilData").appendChild(hasil);
+  document.getElementById("btnPDF").style.display = "inline-block";
+}
 
     function simpanPDF() {
       const laporan = document.getElementById("laporan-section");
