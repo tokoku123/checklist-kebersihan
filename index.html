@@ -3,19 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Checklist Kebersihan + Foto</title>
+  <title>Checklist Kebersihan Harian</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container" id="login-section">
-    <h2>Login Petugas</h2>
-    <label for="password">Masukkan Password:</label>
-    <input type="password" id="password" placeholder="Password..." />
-    <button onclick="cekPassword()">Masuk</button>
-    <p id="pesan" style="color:red;"></p>
-  </div>
-
-  <div class="container" id="main-section" style="display: none;">
+  <div class="container">
     <h2>Checklist Kebersihan Harian</h2>
 
     <label for="tanggal">Tanggal:</label>
@@ -26,86 +18,77 @@
 
     <div class="task">
       <label><input type="checkbox" id="sapu" /> Menyapu Lantai</label>
+      <input type="file" id="foto-sapu" accept="image/*" />
+      <div class="preview" id="preview-sapu"></div>
+
       <label><input type="checkbox" id="pel" /> Mengepel Lantai</label>
+      <input type="file" id="foto-pel" accept="image/*" />
+      <div class="preview" id="preview-pel"></div>
+
       <label><input type="checkbox" id="lap" /> Membersihkan Meja</label>
+      <input type="file" id="foto-lap" accept="image/*" />
+      <div class="preview" id="preview-lap"></div>
+
       <label><input type="checkbox" id="sampah" /> Membuang Sampah</label>
+      <input type="file" id="foto-sampah" accept="image/*" />
+      <div class="preview" id="preview-sampah"></div>
     </div>
 
     <label for="catatan">Catatan Tambahan:</label>
     <textarea id="catatan" rows="3" placeholder="Contoh: sabun pel habis..."></textarea>
 
-    <label for="foto">Upload Foto Hasil Kebersihan:</label>
-    <input type="file" id="foto" multiple accept="image/*" />
-    <div class="preview" id="previewFoto"></div>
-
     <button onclick="simpanChecklist()">Simpan Checklist</button>
   </div>
 
   <script>
-    function cekPassword() {
-      const input = document.getElementById("password").value;
-      const pesan = document.getElementById("pesan");
-      if (input === "kakipendek") {
-        document.getElementById("login-section").style.display = "none";
-        document.getElementById("main-section").style.display = "block";
-      } else {
-        pesan.textContent = "Password salah!";
-      }
-    }
-
-    const fotoInput = document.getElementById("foto");
-    const previewFoto = document.getElementById("previewFoto");
-
-    if (fotoInput) {
-      fotoInput.addEventListener("change", function () {
-        previewFoto.innerHTML = "";
-        Array.from(fotoInput.files).forEach((file) => {
+    const tugasList = ["sapu", "pel", "lap", "sampah"];
+    tugasList.forEach(id => {
+      const input = document.getElementById("foto-" + id);
+      const preview = document.getElementById("preview-" + id);
+      input.addEventListener("change", () => {
+        const file = input.files[0];
+        if (file) {
           const reader = new FileReader();
-          reader.onload = function (e) {
+          reader.onload = e => {
             const img = document.createElement("img");
             img.src = e.target.result;
             img.classList.add("foto-preview");
-            previewFoto.appendChild(img);
+            preview.innerHTML = "";
+            preview.appendChild(img);
           };
           reader.readAsDataURL(file);
-        });
+        }
       });
-    }
+    });
 
     function simpanChecklist() {
-      const tanggal = document.getElementById("tanggal").value;
-      const petugas = document.getElementById("petugas").value;
-      const catatan = document.getElementById("catatan").value;
-
-      const tugas = [
-        { label: "Menyapu Lantai", done: document.getElementById("sapu").checked },
-        { label: "Mengepel Lantai", done: document.getElementById("pel").checked },
-        { label: "Membersihkan Meja", done: document.getElementById("lap").checked },
-        { label: "Membuang Sampah", done: document.getElementById("sampah").checked }
-      ];
-
       const hasilChecklist = {
-        tanggal,
-        petugas,
-        catatan,
-        tugas,
-        fotoData: []
+        tanggal: document.getElementById("tanggal").value,
+        petugas: document.getElementById("petugas").value,
+        catatan: document.getElementById("catatan").value,
+        tugas: [],
+        fotoTugas: {}
       };
 
-      const files = document.getElementById("foto").files;
       const promises = [];
 
-      for (let i = 0; i < files.length; i++) {
-        const reader = new FileReader();
-        const promise = new Promise(resolve => {
-          reader.onload = () => {
-            hasilChecklist.fotoData.push(reader.result);
-            resolve();
-          };
-          reader.readAsDataURL(files[i]);
-        });
-        promises.push(promise);
-      }
+      tugasList.forEach(id => {
+        const checked = document.getElementById(id).checked;
+        hasilChecklist.tugas.push({ label: id, done: checked });
+        const input = document.getElementById("foto-" + id);
+        const file = input.files[0];
+        if (file) {
+          const reader = new FileReader();
+          const promise = new Promise(resolve => {
+            reader.onload = () => {
+              hasilChecklist.fotoTugas[id] = reader.result;
+              resolve();
+            };
+            reader.readAsDataURL(file);
+          });
+          promises.push(promise);
+        }
+      });
 
       Promise.all(promises).then(() => {
         localStorage.setItem("checklistTerakhir", JSON.stringify(hasilChecklist));
