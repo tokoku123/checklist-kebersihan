@@ -8,16 +8,37 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-  <div class="container" id="laporan">
-    <h2>Hasil Checklist Kebersihan</h2>
-    <div id="hasilData"></div>
+
+  <!-- FORM LOGIN UNTUK ATASAN -->
+  <div class="container" id="login-section">
+    <h2>Login Atasan</h2>
+    <label for="password">Masukkan Password:</label>
+    <input type="password" id="password" placeholder="Password..." />
+    <button onclick="cekPassword()">Lihat Hasil</button>
+    <p id="pesan" style="color:red;"></p>
   </div>
 
-  <div style="text-align: center; margin-top: 20px;">
-    <button id="btnPDF" style="display: none;" onclick="simpanPDF()">💾 Simpan ke PDF</button>
+  <!-- LAPORAN HASIL -->
+  <div class="container" id="laporan-section" style="display: none;">
+    <h2>Hasil Checklist Kebersihan</h2>
+    <div id="hasilData"></div>
+    <div style="text-align: center; margin-top: 20px;">
+      <button id="btnPDF" style="display: none;" onclick="simpanPDF()">💾 Simpan ke PDF</button>
+    </div>
   </div>
 
   <script>
+    function cekPassword() {
+      const pw = document.getElementById("password").value;
+      if (pw === "nitajelek") {
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("laporan-section").style.display = "block";
+        tampilkanData();
+      } else {
+        document.getElementById("pesan").textContent = "Password salah!";
+      }
+    }
+
     function tampilkanData() {
       const data = JSON.parse(localStorage.getItem("checklistTerakhir"));
       if (!data) {
@@ -32,8 +53,8 @@
       `;
       data.tugas.forEach((t, i) => {
         html += `<li>${t.done ? "✅" : "❌"} ${t.label}</li>`;
-        const tugasId = t.label;
-        if (data.fotoTugas[tugasId]) {
+        const tugasId = t.label.toLowerCase();
+        if (data.fotoTugas && data.fotoTugas[tugasId]) {
           html += `<br><img src="${data.fotoTugas[tugasId]}" class="foto-preview">`;
         }
       });
@@ -45,7 +66,7 @@
     }
 
     function simpanPDF() {
-      const laporan = document.getElementById("laporan");
+      const laporan = document.getElementById("laporan-section");
       setTimeout(() => {
         html2pdf().set({
           margin: 10,
@@ -56,8 +77,6 @@
         }).from(laporan).save();
       }, 500);
     }
-
-    window.onload = tampilkanData;
   </script>
 </body>
 </html>
