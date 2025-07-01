@@ -7,7 +7,15 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="login-section">
+    <h2>Login Petugas</h2>
+    <label for="password">Masukkan Password:</label>
+    <input type="password" id="password" placeholder="Password..." />
+    <button onclick="cekPassword()">Masuk</button>
+    <p id="pesan" style="color:red;"></p>
+  </div>
+
+  <div class="container" id="main-section" style="display: none;">
     <h2>Checklist Kebersihan Harian</h2>
 
     <label for="tanggal">Tanggal:</label>
@@ -28,29 +36,41 @@
 
     <label for="foto">Upload Foto Hasil Kebersihan:</label>
     <input type="file" id="foto" multiple accept="image/*" />
-
     <div class="preview" id="previewFoto"></div>
 
     <button onclick="simpanChecklist()">Simpan Checklist</button>
   </div>
 
   <script>
+    function cekPassword() {
+      const input = document.getElementById("password").value;
+      const pesan = document.getElementById("pesan");
+      if (input === "kakipendek") {
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("main-section").style.display = "block";
+      } else {
+        pesan.textContent = "Password salah!";
+      }
+    }
+
     const fotoInput = document.getElementById("foto");
     const previewFoto = document.getElementById("previewFoto");
 
-    fotoInput.addEventListener("change", function () {
-      previewFoto.innerHTML = "";
-      Array.from(fotoInput.files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const img = document.createElement("img");
-          img.src = e.target.result;
-          img.classList.add("foto-preview");
-          previewFoto.appendChild(img);
-        };
-        reader.readAsDataURL(file);
+    if (fotoInput) {
+      fotoInput.addEventListener("change", function () {
+        previewFoto.innerHTML = "";
+        Array.from(fotoInput.files).forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.classList.add("foto-preview");
+            previewFoto.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
       });
-    });
+    }
 
     function simpanChecklist() {
       const tanggal = document.getElementById("tanggal").value;
