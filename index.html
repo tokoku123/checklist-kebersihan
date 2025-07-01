@@ -74,7 +74,11 @@
 
       tugasList.forEach(id => {
         const checked = document.getElementById(id).checked;
-        hasilChecklist.tugas.push({ label: id, done: checked });
+        hasilChecklist.tugas.push({
+          id: id,
+          label: document.querySelector("label[for='" + id + "']")?.innerText || id,
+          done: checked
+        });
         const input = document.getElementById("foto-" + id);
         const file = input.files[0];
         if (file) {
