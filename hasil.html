@@ -30,19 +30,15 @@
         <p><strong>Petugas:</strong> ${data.petugas}</p>
         <ul>
       `;
-      data.tugas.forEach(t => {
+      data.tugas.forEach((t, i) => {
         html += `<li>${t.done ? "✅" : "❌"} ${t.label}</li>`;
+        const tugasId = t.label;
+        if (data.fotoTugas[tugasId]) {
+          html += `<br><img src="${data.fotoTugas[tugasId]}" class="foto-preview">`;
+        }
       });
       html += `</ul>`;
       html += `<p><strong>Catatan:</strong> ${data.catatan || '-'}</p>`;
-
-      if (data.fotoData && data.fotoData.length > 0) {
-        html += `<p><strong>Foto:</strong></p><div class="foto-hasil">`;
-        data.fotoData.forEach(src => {
-          html += `<img src="${src}" class="foto-preview">`;
-        });
-        html += `</div>`;
-      }
 
       document.getElementById("hasilData").innerHTML = html;
       document.getElementById("btnPDF").style.display = "inline-block";
