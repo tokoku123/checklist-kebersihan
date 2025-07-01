@@ -51,15 +51,14 @@
         <p><strong>Petugas:</strong> ${data.petugas}</p>
         <ul>
       `;
-      data.tugas.forEach((t, i) => {
+      data.tugas.forEach((t) => {
         html += `<li>${t.done ? "✅" : "❌"} ${t.label}</li>`;
-        const tugasId = t.label.toLowerCase();
-        if (data.fotoTugas && data.fotoTugas[tugasId]) {
-          html += `<br><img src="${data.fotoTugas[tugasId]}" class="foto-preview">`;
+        if (data.fotoTugas && data.fotoTugas[t.id]) {
+          html += `<br><img src="${data.fotoTugas[t.id]}" class="foto-preview">`;
         }
       });
       html += `</ul>`;
-      html += `<p><strong>Catatan:</strong> ${data.catatan || '-'}</p>`;
+      html += `<p><strong>Catatan:</strong> ${data.catatan?.trim() || '-'}</p>`;
 
       document.getElementById("hasilData").innerHTML = html;
       document.getElementById("btnPDF").style.display = "inline-block";
